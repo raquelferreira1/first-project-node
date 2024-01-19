@@ -41,11 +41,16 @@ app.get('/orders/:id', checkMetUrl, (request, response) => {
 
 //A rota deve receber o pedido do cliente, o nome do cliente e o valor do pedido, essas informações devem ser passadas dentro do corpo(body) da requisição, e com essas informações você deve registrar o novo pedido.
 app.post('/orders', checkMetUrl, (request, response) => {
-    const { order, clientName, price } = request.body
-    const status = "Em preparação"
-    const user = { id: uuid.v4(), order, clientName, price, status }
-    orders.push(user)
-    return response.status(201).json(user)
+    try {
+        const { order, clientName, price } = request.body
+        if(clientName === "") throw new Error("Insira o nome")
+        const status = "Em preparação"
+        const user = { id: uuid.v4(), order, clientName, price, status }
+        orders.push(user)
+        return response.status(201).json(user)
+    }
+    catch (err) { return response.status(400).json({ error: err.message }) }
+    finally { console.log("Terminou") }
 })
 
 //Essa rota deve alterar um pedido já feito. Pode alterar um ou todos os dados do pedido. O id do pedido deve ser enviado nos parâmetros da rota.
